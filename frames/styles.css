@@ -1,0 +1,27 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.header-frame {
+    flex: 0 0 50px; /* Decreased height for the header */
+    border: none;
+    height: 80px;
+    width: 100%;
+}
+
+.body-frame {
+    flex: 1; /* Take the remaining space */
+    border: none;
+    width: 100%;
+    
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+}

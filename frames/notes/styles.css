@@ -1,0 +1,71 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0;
+    background-image: url('https://www.valmariepaper.com/wp-content/uploads/2016/11/ValMariePaper-170-1024x1024.jpg');
+}
+
+.container {
+    background-color: #fff;
+    width: 60%;
+    max-width: 800px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.tabs {
+    display: flex;
+    background-color: #007bff;
+    padding: 10px;
+}
+
+.tabs button {
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-right: 5px;
+    border-radius: 4px;
+}
+
+.tabs button.active {
+    background-color: #004085;
+}
+
+.tabs button:hover {
+    background-color: #003366;
+}
+
+.content {
+    padding: 20px;
+}
+
+textarea {
+    width: 100%;
+    height: 300px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+button#saveBtn {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button#saveBtn:hover {
+    background-color: #218838;
+}
