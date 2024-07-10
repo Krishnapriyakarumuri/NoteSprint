@@ -43,9 +43,10 @@ if (isset($_POST['reg_user'])) {
     $password = md5($password); //encrypt the password before saving in the database
 
     $query = "INSERT INTO userdetails (username, email, psswd) 
-          VALUES('$username', '$email', '$password')";
+              VALUES('$username', '$email', '$password')";
     mysqli_query($db, $query);
     $_SESSION['username'] = $username;
+    $_SESSION['email'] = $email; // Store email in session
     $_SESSION['success'] = "You are now logged in";
     header('location: index.php');
   }
@@ -71,10 +72,43 @@ if (isset($_POST['login_user'])) {
     if (mysqli_num_rows($results) == 1) {
       $_SESSION['username'] = $username;
       $_SESSION['success'] = "You are now logged in";
+      $user = mysqli_fetch_assoc($results);
+      $_SESSION['email'] = $user['email']; // Store email in session
       header('location: frames.html');
     } else {
       array_push($errors, "Wrong username/password combination");
     }
   }
 }
+
+// SAVE EVENT
+if (isset($_POST['save_event'])) {
+  $eventDate = mysqli_real_escape_string($db, $_POST['eventDate']);
+  $eventTitle = mysqli_real_escape_string($db, $_POST['eventTitle']);
+  $email = $_SESSION['email']; // Fetch email from session
+  $username = $_SESSION['username']; // Fetch username from session
+
+  $query = "INSERT INTO calendar (eventdate, eventtitle, username, email) 
+            VALUES('$eventDate', '$eventTitle', '$username', '$email')";
+  mysqli_query($db, $query);
+  echo "Event saved successfully";
+  exit();
+}
+
+
+// SAVE NOTE
+if (isset($_POST['save_note'])) {
+  $title = mysqli_real_escape_string($db, $_POST['title']);
+  $short_description = mysqli_real_escape_string($db, $_POST['short_description']);
+  $email = $_SESSION['email']; // Fetch email from session
+  $username = $_SESSION['username']; // Fetch username from session
+
+  $query = "INSERT INTO notes (title, short_description, username, email) 
+            VALUES('$title', '$short_description', '$username', '$email')";
+  mysqli_query($db, $query);
+  echo "Note saved successfully";
+  exit();
+}
+
+
 ?>

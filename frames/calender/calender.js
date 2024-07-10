@@ -1,4 +1,3 @@
-// script.js
 document.addEventListener('DOMContentLoaded', function () {
     const calendarDays = document.getElementById('calendar-days');
     const monthYear = document.getElementById('month-year');
@@ -16,6 +15,25 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentYear = new Date().getFullYear();
     let events = {};
 
+    // Function to fetch events for the logged-in user
+    function fetchEvents() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'get_events.php', true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                const response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    events = response.events;
+                    renderCalendar(currentMonth, currentYear);
+                } else {
+                    console.error('Failed to fetch events:', response.message);
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    // Function to render the calendar for a given month and year
     function renderCalendar(month, year) {
         calendarDays.innerHTML = '';
         monthYear.innerText = `${new Date(year, month).toLocaleString('default', { month: 'long' })} ${year}`;
@@ -55,11 +73,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Function to open the event sidebar and render event list for a specific date
     function openSidebar(date) {
         eventSidebar.classList.add('open');
         renderEventList(date);
     }
 
+    // Function to render the event list for a specific date
     function renderEventList(date) {
         eventList.innerHTML = '';
         if (events[date]) {
@@ -81,6 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Function to delete an event from the list and update the calendar
     function deleteEvent(date, index) {
         events[date].splice(index, 1);
         if (events[date].length === 0) {
@@ -88,8 +109,49 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         renderCalendar(currentMonth, currentYear);
         renderEventList(date);
+        saveEventsToDatabase(); // Update database after deletion
     }
 
+    // Function to save events to the database via AJAX
+    function saveEventsToDatabase() {
+        const eventsData = JSON.stringify(events); // Convert events object to JSON
+
+        // AJAX request to save_events.php
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'save_events.php', true);
+        xhr.setRequestHeader('Content-type', 'application/json');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                const response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    console.log('Events saved successfully:', response.message);
+                } else {
+                    console.error('Failed to save events:', response.message);
+                }
+            }
+        };
+        xhr.send(eventsData);
+    }
+
+    // Event listener for the event form submission
+    eventForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const date = eventDateInput.value;
+        const title = eventTitleInput.value;
+
+        if (date && title) {
+            if (!events[date]) {
+                events[date] = [];
+            }
+            events[date].push(title);
+            renderCalendar(currentMonth, currentYear);
+            renderEventList(date);
+            saveEventsToDatabase(); // Update database after addition
+            eventForm.reset();
+        }
+    });
+
+    // Event listeners for navigating through months
     prevMonthBtn.addEventListener('click', function () {
         currentMonth--;
         if (currentMonth < 0) {
@@ -108,27 +170,7 @@ document.addEventListener('DOMContentLoaded', function () {
         renderCalendar(currentMonth, currentYear);
     });
 
-    saveEventsBtn.addEventListener('click', function () {
-        eventSidebar.classList.remove('open');
-    });
-
-    eventForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-        const date = eventDateInput.value;
-        const title = eventTitleInput.value;
-
-        if (date && title) {
-            if (!events[date]) {
-                events[date] = [];
-            }
-            events[date].push(title);
-            renderCalendar(currentMonth, currentYear);
-            renderEventList(date);
-            eventForm.reset();
-        }
-    });
-
-    // Initialize Flatpickr
+    // Initialize Flatpickr for date selection
     flatpickr("#calendar-icon", {
         onChange: function (selectedDates) {
             const date = selectedDates[0];
@@ -138,5 +180,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Fetch events when the page loads
+    fetchEvents();
+
+    // Render the calendar for the initial month and year
     renderCalendar(currentMonth, currentYear);
 });
+
